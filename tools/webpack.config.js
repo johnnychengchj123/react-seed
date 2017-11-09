@@ -51,7 +51,7 @@ const config = {
 
   output: {
     path: path.resolve(__dirname, '../build/public/assets'),
-    publicPath: '/assets/',
+    publicPath: env.raw.REACT_APP_CDN || '/assets/',
     pathinfo: isVerbose,
     filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
     chunkFilename: isDebug

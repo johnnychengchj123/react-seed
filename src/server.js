@@ -13,7 +13,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import expressJwt, { UnauthorizedError as Jwt401Error } from 'express-jwt';
 // import expressGraphQL from 'express-graphql';
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
@@ -69,8 +69,8 @@ app.use((err, req, res, next) => {
 });
 
 // app.use(passport.initialize());
-
-if (__DEV__) {
+/* eslint-disable no-underscore-dangle */
+if (process.env.__DEV__) {
   app.enable('trust proxy');
 }
 // app.get(

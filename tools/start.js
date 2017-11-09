@@ -18,7 +18,8 @@ import webpackConfig from './webpack.config';
 import run, { format } from './run';
 import clean from './clean';
 
-const isDebug = !process.argv.includes('--release');
+const isDebug =
+  !process.argv.includes('--release') && !process.argv.includes('--uat');
 
 // https://webpack.js.org/configuration/watch/#watchoptions
 const watchOptions = {

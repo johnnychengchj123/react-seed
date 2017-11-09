@@ -132,7 +132,8 @@ async function onLocationChange(location, action) {
       },
     );
   } catch (error) {
-    if (__DEV__) {
+    /* eslint-disable no-underscore-dangle */
+    if (process.env.__DEV__) {
       throw error;
     }
 

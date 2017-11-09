@@ -28,6 +28,7 @@ class Home extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           <h1>React.js News</h1>
+          <p>{process.env.REACT_APP_API_ZTBSAS}</p>
         </div>
       </div>
     );

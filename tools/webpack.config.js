@@ -14,8 +14,17 @@ import nodeExternals from 'webpack-node-externals';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import overrideRules from './lib/overrideRules';
 import pkg from '../package.json';
+import getClientEnvironment from './env';
+import paths from './paths';
 
-const isDebug = !process.argv.includes('--release');
+const publicPath = paths.servedPath;
+const publicUrl = publicPath.slice(0, -1);
+const env = getClientEnvironment(publicUrl);
+
+/* eslint-disable no-underscore-dangle */
+
+const isDebug = env.raw.__DEV__ === 'true';
+// !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
 const isAnalyze =
   process.argv.includes('--analyze') || process.argv.includes('--analyse');
@@ -302,9 +311,10 @@ const clientConfig = {
     // Define free variables
     // https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
+      // 'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
+      // __DEV__: isDebug,
+      ...env.stringified,
       'process.env.BROWSER': true,
-      __DEV__: isDebug,
     }),
 
     // Emit a file with assets paths
@@ -454,9 +464,10 @@ const serverConfig = {
     // Define free variables
     // https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
+      ...env.stringified,
+      // 'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
       'process.env.BROWSER': false,
-      __DEV__: isDebug,
+      // __DEV__: isDebug,
     }),
 
     // Adds a banner to the top of each generated chunk

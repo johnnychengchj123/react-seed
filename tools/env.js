@@ -3,10 +3,22 @@ import path from 'path';
 import dotenv from 'dotenv';
 import paths from './paths';
 
-process.env.NODE_ENV = process.argv.includes('--release')
-  ? 'production'
-  : 'development';
+const production = process.argv.includes('--release');
+const test = process.argv.includes('--uat');
 
+let isDebug = true;
+
+/* eslint-disable no-underscore-dangle */
+if (production) {
+  process.env.NODE_ENV = 'production';
+  isDebug = false;
+} else if (test) {
+  process.env.NODE_ENV = 'uat';
+  isDebug = false;
+} else {
+  process.env.NODE_ENV = 'development';
+  isDebug = true;
+}
 // Make sure that including paths.js after env.js will read .env variables.
 delete require.cache[require.resolve('./paths')];
 
@@ -73,6 +85,8 @@ function getClientEnvironment(publicUrl) {
         // Useful for determining whether we’re running in production mode.
         // Most importantly, it switches React into the correct mode.
         NODE_ENV: process.env.NODE_ENV || 'development',
+        /* eslint-disable no-underscore-dangle */
+        __DEV__: isDebug,
         // Useful for resolving the correct path to static assets in `public`.
         // For example, <img src={process.env.PUBLIC_URL + '/img/logo.png'} />.
         // This should only be used as an escape hatch. Normally you would put

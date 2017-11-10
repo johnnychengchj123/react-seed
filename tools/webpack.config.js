@@ -311,9 +311,9 @@ const clientConfig = {
     // Define free variables
     // https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
-      // 'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
       // __DEV__: isDebug,
       ...env.stringified,
+      'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
       'process.env.BROWSER': true,
     }),
 
@@ -465,7 +465,7 @@ const serverConfig = {
     // https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
       ...env.stringified,
-      // 'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
+      'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
       'process.env.BROWSER': false,
       // __DEV__: isDebug,
     }),

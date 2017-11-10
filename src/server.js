@@ -14,7 +14,7 @@ import bodyParser from 'body-parser';
 import expressJwt, { UnauthorizedError as Jwt401Error } from 'express-jwt';
 // import expressGraphQL from 'express-graphql';
 // import jwt from 'jsonwebtoken';
-import fetch from 'node-fetch';
+import nodeFetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
@@ -22,13 +22,16 @@ import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
-import createFetch from './createFetch';
+// import createFetch from './createFetch';
 // import passport from './passport';
+import configureStore from './store';
 import router from './router';
 // import models from './data/models';
 // import schema from './data/schema';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import config from './config';
+
+global.fetch = nodeFetch;
 
 const app = express();
 
@@ -114,6 +117,33 @@ app.get('*', async (req, res, next) => {
   try {
     const css = new Set();
 
+    // const fetch = createFetch(nodeFetch, {
+    //   baseUrl: config.api.serverUrl,
+    //   cookie: req.headers.cookie,
+    // });
+
+    let store;
+
+    if (global.__store) {
+      store = global.__store;
+    } else {
+      const initialState = {};
+      store = configureStore(initialState, {
+        fetch,
+        // I should not use `history` on server.. but how I do redirection? follow universal-router
+      });
+
+      global.__store = store;
+    }
+
+    // store.dispatch({
+    //   type: 'SET_RUNTIME_VARIABLE',
+    //   payload: {
+    //     name: 'initialNow',
+    //     value: Date.now(),
+    //   },
+    // });
+
     // Global (context) variables that can be easily accessed from any React component
     // https://facebook.github.io/react/docs/context.html
     const context = {
@@ -124,10 +154,9 @@ app.get('*', async (req, res, next) => {
         styles.forEach(style => css.add(style._getCss()));
       },
       // Universal HTTP client
-      fetch: createFetch(fetch, {
-        baseUrl: config.api.serverUrl,
-        cookie: req.headers.cookie,
-      }),
+      fetch,
+      store,
+      storeSubscription: null,
     };
 
     const route = await router.resolve({
@@ -143,7 +172,9 @@ app.get('*', async (req, res, next) => {
 
     const data = { ...route };
     data.children = ReactDOM.renderToString(
-      <App context={context}>{route.component}</App>,
+      <App context={context} store={store}>
+        {route.component}
+      </App>,
     );
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
     data.scripts = [assets.vendor.js];
@@ -153,9 +184,11 @@ app.get('*', async (req, res, next) => {
     data.scripts.push(assets.client.js);
     data.app = {
       apiUrl: config.api.clientUrl,
+      state: context.store.getState(),
     };
 
     const html = ReactDOM.renderToStaticMarkup(<Html {...data} />);
+
     res.status(route.status || 200);
     res.send(`<!doctype html>${html}`);
   } catch (err) {

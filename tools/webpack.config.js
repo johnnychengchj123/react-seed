@@ -23,7 +23,7 @@ const env = getClientEnvironment(publicUrl);
 
 /* eslint-disable no-underscore-dangle */
 
-const isDebug = env.raw.__DEV__ === 'true';
+const isDebug = env.raw.__DEV__;
 // !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
 const isAnalyze =

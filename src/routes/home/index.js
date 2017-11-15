@@ -1,17 +1,20 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import React from 'react';
 import Layout from '../../components/Layout';
 import HomeCtner from './Ctner';
+import { addReducer } from '../../store';
+import actions, { reducers, fetchNews } from './redux';
 
-async function action() {
+async function action({ store }) {
+  addReducer(store, reducers);
+
+  const news = await fetchNews({
+    columnId: '030008',
+    pageNum: 1,
+    pageSize: 10,
+  });
+
+  store.dispatch(actions.setNews(news));
+
   return {
     chunks: ['home'],
     title: 'React Starter Kit',

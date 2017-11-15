@@ -7,20 +7,9 @@ import actions from './redux';
 
 class Ctner extends Component {
   static propTypes = {
-    actions: PropTypes.shape({
-      loadNews: PropTypes.func.isRequired,
-    }).isRequired,
     // eslint-disable-next-line
     news: PropTypes.object,
   };
-
-  componentWillMount() {
-    this.props.actions.loadNews({
-      columnId: '030008',
-      pageNum: 1,
-      pageSize: 10,
-    });
-  }
 
   render() {
     const { news } = this.props;
